@@ -39,7 +39,7 @@ class MWS:
             if 'GeneratedReportId' in report_request_info:
                 report_id = report_request_info['GeneratedReportId']['value']
         except Exception:
-            print(f'GetReportRequestList failedfor {request_id}')
+            print(f'GetReportRequestList failed for {request_id}')
             raise
         return status, report_id
 
