@@ -18,6 +18,8 @@ class Datadotworld:
         if r.status_code != 200:
             print(f'Failed to download {filename} from data.world')
             r.raise_for_status()
+        # elif :  # TODO specific error that denotes file doesn't exist
+        #     return None
 
         return pd.read_csv(StringIO(r.text))
 

@@ -7,10 +7,10 @@
   "keywords": ["data.world", "amazon", "mws", "etl"],
   "addons": [
     {
-      "plan": "scheduler:standard"
+      "plan": "redistogo:nano"
     },
     {
-      "plan": "redistogo:nano"
+      "plan": "scheduler:standard"
     }
   ],
   "env": {
@@ -21,11 +21,11 @@
       "description": "data.world dataset in the format: owner/dataset-id"
     },
     "ALL_ORDERS_FILENAME": {
-      "description": "",
+      "description": "Name of the file for all the orders",
       "value": "AmazonAllOrders.csv"
     },
     "CUSTOMER_RETURNS_FILENAME": {
-      "description": "",
+      "description": "Name of the file for the customer returns",
       "value": "AmazonFBAFulfillmentCustomerReturns.csv"
     },
     "RECORD_START_DATE": {
@@ -43,8 +43,8 @@
     "MWS_AUTH_TOKEN": {
       "description": ""
     },
-    "MWS_MARKETPLACE_ID": {
-      "description": ""
+    "MWS_MARKETPLACE_IDS": {
+      "description": ", can be a single value or a comma-separated list: ABCDGEFG,OPQRSTUV"
     }
   }
 }

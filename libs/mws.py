@@ -6,8 +6,8 @@ import pandas as pd
 
 
 class MWS:
-    def __init__(self, access_key, secret_key, seller_id, auth_token, marketplace_id):
-        self.marketplace_id = marketplace_id
+    def __init__(self, access_key, secret_key, seller_id, auth_token, marketplace_ids):
+        self.marketplace_ids = marketplace_ids
 
         self.reports_api = mws_api.Reports(
             access_key=access_key,
@@ -20,7 +20,7 @@ class MWS:
         r = self.reports_api.request_report(report_type=report_type,
                                             start_date=start_date,
                                             end_date=end_date,
-                                            marketplaceids=self.marketplace_id)
+                                            marketplaceids=self.marketplace_ids)
 
         try:
             request_id = r.parsed['ReportRequestInfo']['ReportRequestId']['value']
@@ -53,6 +53,10 @@ class MWS:
             raise
         return report
 
+    # TODO pull data from record_start_date
+    def pull_historical_data(self, report_type, record_start_date, end_date):
+        pass
+
     def pull_from_mws(self, report_type, start_date, end_date):
         request_id = self.request_report(report_type=report_type,
                                          start_date=start_date,
@@ -67,7 +71,7 @@ class MWS:
             if status in ('_DONE_', '_DONE_NO_DATA_'):
                 break
             elif status == '_CANCELLED_':
-                raise Exception(f'Request {request_id} was cancelled')
+                print(f'Request {request_id} was cancelled, skipping report')
             counter += 1
 
         raw_report = self.get_report(report_id) if report_id else None
