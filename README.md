@@ -7,7 +7,8 @@
 1. [Create a dataset](https://data.world/create-a-dataset) on data.world
 2. Create a [Heroku](https://www.heroku.com) account
 3. [Verify](https://heroku.com/verify) the account; basically, add a credit card
-4. Deploy to Heroku using the fancy-looking button above
+4. Deploy to Heroku using the fancy-looking button above (details on the configuration variables are available below)
+5. Setup the Scheduler plugin
  
 ### Configuration Variables:
 

@@ -15,11 +15,17 @@ class Datadotworld:
         url = f'{BASE_DW_URL}/file_download/{self.dataset}/{filename}'
 
         r = requests.get(url, headers=self.headers)
-        if r.status_code != 200:
+        if r.status_code == 404:  # Dataset or file is inaccessible
+            url = f'{BASE_DW_URL}/datasets/{self.dataset}'
+
+            r = requests.get(url, headers=self.headers)
+            if r != 200:
+                raise Exception(f"Dataset '{self.dataset}' doesn't exist or you don't have access to it")
+            else:  # Dataset exists but the file doesn't; the full historical record should be pulled
+                return None
+        elif r.status_code != 200:
             print(f'Failed to download {filename} from data.world')
             r.raise_for_status()
-        # elif :  # TODO specific error that denotes file doesn't exist
-        #     return None
 
         return pd.read_csv(StringIO(r.text))
 

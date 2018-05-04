@@ -1,4 +1,5 @@
 import time
+from datetime import datetime, timedelta
 from io import StringIO
 
 import mws as mws_api
@@ -53,9 +54,27 @@ class MWS:
             raise
         return report
 
-    # TODO pull data from record_start_date
     def pull_historical_data(self, report_type, record_start_date, end_date):
-        pass
+        df = pd.DataFrame()
+
+        dates = []
+        dt = datetime.strptime(record_start_date, '%Y-%m-%d')
+        end_dt = datetime.strptime(end_date, '%Y-%m-%d')
+        dates.append(dt.isoformat())
+        while True:
+            dt = dt + timedelta(days=30)
+            if dt < end_dt:
+                dates.append(dt.isoformat())
+            else:
+                dates.append(end_dt.isoformat())
+                break
+
+        for i in range(len(dates)):
+            if i < len(dates) - 1:
+                df_tmp = self.pull_from_mws(report_type, start_date=dates[i], end_date=dates[i + 1])
+                df.append(df_tmp, ignore_index=True)
+
+        return df
 
     def pull_from_mws(self, report_type, start_date, end_date):
         request_id = self.request_report(report_type=report_type,
@@ -63,7 +82,7 @@ class MWS:
                                          end_date=end_date)
         counter = 0
         while True:
-            time.sleep(10)
+            time.sleep(10)  # Delay here to prevent throttling & the reports are slow to compile
             if counter > 12:  # Timeout after 120 seconds
                 raise Exception('Timeout while pulling from MWS')
 
