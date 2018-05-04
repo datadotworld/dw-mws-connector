@@ -18,7 +18,7 @@
       "description": "data.world API token from https://data.world/settings/advanced"
     },
     "DW_DATASET": {
-      "description": "data.world dataset in the format: owner/dataset-id"
+      "description": "data.world dataset. Format: owner/dataset-id"
     },
     "ALL_ORDERS_FILENAME": {
       "description": "Name of the file for all the orders",
@@ -29,22 +29,22 @@
       "value": "AmazonFBAFulfillmentCustomerReturns.csv"
     },
     "RECORD_START_DATE": {
-      "description": "How far back to pull data from, syntax: 2017-01-01"
+      "description": "How far back to pull data from. Format: 2017-01-01"
     },
     "MWS_ACCESS_KEY": {
-      "description": ""
+      "description": "The Access Key that you received when you registered for Amazon MWS"
     },
     "MWS_SECRET_KEY": {
-      "description": ""
+      "description": "The Secret Key that you received when you registered for Amazon MWS"
     },
     "MWS_SELLER_ID": {
-      "description": ""
+      "description": "The seller identifier that you received when you registered for Amazon MWS"
     },
     "MWS_AUTH_TOKEN": {
-      "description": ""
+      "description": "The authorization token that you received when you registered for Amazon MWS"
     },
     "MWS_MARKETPLACE_IDS": {
-      "description": ", can be a single value or a comma-separated list: ABCDGEFG,OPQRSTUV"
+      "description": "Marketplace IDs you're registered to sell in. Can be a single value or a comma-separated list: ABCDGEFG,OPQRSTUV"
     }
   }
 }
