@@ -1,0 +1,47 @@
+{
+  "name": "data.world & Amazon MWS Connector",
+  "description": "Pulls data from your Amazon MWS account and pushes it to a data.world dataset",
+  "repository": "https://github.com/datadotworld/heroku-dw-mws-connector",
+  "website": "https://data.world",
+  "logo": "https://assets.data.world/assets/logo-full.5432118c2466c4b685e7cd5028850e02.svg",
+  "keywords": ["data.world", "amazon", "mws", "etl"],
+  "addons": [
+    {
+      "plan": "scheduler:standard"
+    },
+    {
+      "plan": "redistogo:nano"
+    }
+  ],
+  "env": {
+    "DW_TOKEN": {
+      "description": "data.world API token from: https://data.world/settings/advanced"
+    },
+    "DW_DATASET": {
+      "description": "data.world dataset in the format: owner/dataset-id"
+    },
+    "ALL_ORDERS_FILENAME": {
+      "description": "",
+      "value": "AmazonAllOrders.csv"
+    },
+    "CUSTOMER_RETURNS_FILENAME": {
+      "description": "",
+      "value": "AmazonFBAFulfillmentCustomerReturns.csv"
+    },
+    "MWS_ACCESS_KEY": {
+      "description": ""
+    },
+    "MWS_SECRET_KEY": {
+      "description": ""
+    },
+    "MWS_SELLER_ID": {
+      "description": ""
+    },
+    "MWS_AUTH_TOKEN": {
+      "description": ""
+    },
+    "MWS_MARKETPLACE_ID": {
+      "description": ""
+    }
+  }
+}
