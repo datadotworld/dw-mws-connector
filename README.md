@@ -1,4 +1,4 @@
-# MWS
+# data.world & Amazon MWS Connector
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/datadotworld/heroku-dw-mws-connector)
 

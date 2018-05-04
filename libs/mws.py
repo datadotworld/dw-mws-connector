@@ -1,7 +1,7 @@
 import time
 from io import StringIO
 
-import mws
+import mws as mws_api
 import pandas as pd
 
 
@@ -9,7 +9,7 @@ class MWS:
     def __init__(self, access_key, secret_key, seller_id, auth_token, marketplace_id):
         self.marketplace_id = marketplace_id
 
-        self.reports_api = mws.Reports(
+        self.reports_api = mws_api.Reports(
             access_key=access_key,
             secret_key=secret_key,
             account_id=seller_id,
@@ -25,7 +25,7 @@ class MWS:
         try:
             request_id = r.parsed['ReportRequestInfo']['ReportRequestId']['value']
         except Exception:
-            print('RequestReport failed')
+            print(f'RequestReport failed for {report_type}')
             raise
         return request_id
 
@@ -39,7 +39,7 @@ class MWS:
             if 'GeneratedReportId' in report_request_info:
                 report_id = report_request_info['GeneratedReportId']['value']
         except Exception:
-            print('GetReportRequestList failed')
+            print(f'GetReportRequestList failedfor {request_id}')
             raise
         return status, report_id
 
@@ -49,7 +49,7 @@ class MWS:
         try:
             report = r.original.decode()
         except Exception:
-            print('GetReport failed')
+            print(f'GetReport failed for {report_id}')
             raise
         return report
 
@@ -67,8 +67,7 @@ class MWS:
             if status in ('_DONE_', '_DONE_NO_DATA_'):
                 break
             elif status == '_CANCELLED_':
-                print(request_id)
-                raise Exception('Request was cancelled')
+                raise Exception(f'Request {request_id} was cancelled')
             counter += 1
 
         raw_report = self.get_report(report_id) if report_id else None

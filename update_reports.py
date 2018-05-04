@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from libs.datadotworld import Datadotworld
 from libs.mws import MWS
 
-api_key = os.environ['DW_TOKEN']
+dw_token = os.environ['DW_TOKEN']
 dataset = os.environ['DW_DATASET']
 
 access_key = os.environ['MWS_ACCESS_KEY']
@@ -24,7 +24,7 @@ report_types = [
         'primary_key': 'order-id',
     }]
 
-dw = Datadotworld(api_key, dataset)
+dw = Datadotworld(dw_token, dataset)
 mws = MWS(access_key, secret_key, seller_id, auth_token, marketplace_id)
 
 now = datetime.now()
@@ -32,13 +32,16 @@ start_date = f"{(now - timedelta(days=1)).strftime('%Y-%m-%d')}T00:00:00+00:00"
 end_date = f"{now.strftime('%Y-%m-%d')}T00:00:00+00:00"
 
 for report in report_types:
-    df_new = mws.pull_from_mws(report['type'], start_date, end_date)
+    print(f"Working on {report['type']}")
+    df_new_data = mws.pull_from_mws(report['type'], start_date, end_date)
 
-    if df_new:
+    if df_new_data:
         df = dw.fetch_from_dw(report['filename'])
-        df.update(df_new)
+        df = df.append(df_new_data).drop_duplicates(subset=report['primary_key'], keep='last')
 
         df.to_csv(report['filename'], index=False)
         dw.push_to_dw(report['filename'])
     else:
-        print('No new data')
+        print(f"No new data for {report['type']}")
+
+print('Done!')

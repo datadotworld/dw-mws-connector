@@ -1,5 +1,5 @@
 {
-  "name": "data.world & Amazon MWS Connector",
+  "name": "data.world & MWS Connector",
   "description": "Pulls data from your Amazon MWS account and pushes it to a data.world dataset",
   "repository": "https://github.com/datadotworld/heroku-dw-mws-connector",
   "website": "https://data.world",
@@ -15,7 +15,7 @@
   ],
   "env": {
     "DW_TOKEN": {
-      "description": "data.world API token from: https://data.world/settings/advanced"
+      "description": "data.world API token from https://data.world/settings/advanced"
     },
     "DW_DATASET": {
       "description": "data.world dataset in the format: owner/dataset-id"
@@ -27,6 +27,9 @@
     "CUSTOMER_RETURNS_FILENAME": {
       "description": "",
       "value": "AmazonFBAFulfillmentCustomerReturns.csv"
+    },
+    "RECORD_START_DATE": {
+      "description": "How far back to pull data from, syntax: 2017-01-01"
     },
     "MWS_ACCESS_KEY": {
       "description": ""
