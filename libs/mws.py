@@ -9,15 +9,14 @@ import pandas as pd
 class MWS:
     def __init__(self, access_key, secret_key, seller_id, auth_token, marketplace_ids):
         self.marketplace_ids = marketplace_ids
-
         self.reports_api = mws_api.Reports(
             access_key=access_key,
             secret_key=secret_key,
             account_id=seller_id,
             auth_token=auth_token,
         )
-
         self.thirty_days = 2592000.0
+        self.error_occurred = False
 
     def _request_report(self, report_type, start_date, end_date):
         r = self.reports_api.request_report(report_type=report_type,

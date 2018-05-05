@@ -66,5 +66,6 @@ for report in report_types:
         df.drop_duplicates(subset=report['primary_key'], keep='last').to_csv(report['filename'], index=False)
         dw.push(report['filename'])
 
-dw.update_summary(summary)
+if not mws.error_occurred:
+    dw.update_summary(summary)
 print('Done!')
