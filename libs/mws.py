@@ -71,6 +71,7 @@ class MWS:
                 break
             elif status == '_CANCELLED_':
                 print(f'Request {request_id} was cancelled, skipping report')
+                break
             counter += 1
 
         raw_report = self._get_report(report_id) if report_id else None

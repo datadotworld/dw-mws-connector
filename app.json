@@ -14,7 +14,7 @@
     "DW_TOKEN": {
       "description": "data.world API token from https://data.world/settings/advanced"
     },
-    "DW_DATASET": {
+    "DW_DATASET_SLUG": {
       "description": "data.world dataset. Format: owner/dataset-id"
     },
     "START_DATE": {

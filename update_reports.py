@@ -6,9 +6,9 @@ from libs.datadotworld import Datadotworld
 from libs.mws import MWS
 
 dw_token = os.environ['DW_TOKEN']
-dataset = os.environ['DW_DATASET']  # TODO accept full urls (regex)
+dataset_slug = os.environ['DW_DATASET_SLUG']
 
-start_date = os.environ['START_DATE']
+start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
 access_key = os.environ['MWS_ACCESS_KEY']
 secret_key = os.environ['MWS_SECRET_KEY']
 seller_id = os.environ['MWS_SELLER_ID']
@@ -32,30 +32,26 @@ report_types = [
         'is_date_range_limited': False,
     }]
 
-dw = Datadotworld(dw_token, dataset)
+dw = Datadotworld(dw_token, dataset_slug)
 mws = MWS(access_key, secret_key, seller_id, auth_token, marketplace_ids)
 
 dataset = dw.fetch_dataset()
-tags = dataset['tags']
-
-last_run_time = None
+summary = dataset['summary'] if 'summary' in dataset else ''
 now = datetime.now().replace(microsecond=0)
 
-pattern = r'bot ran ([0-9]*)'
-for i, t in enumerate(tags):
-    match = re.match(pattern, t)
-    if match:
-        last_run_time = float(match.group(1))
-        tags[i] = f'bot ran {int(now.timestamp())}'
-
-if last_run_time:
-    start_date = datetime.fromtimestamp(last_run_time)
+pattern = r'(.*LAST BOT RUN:) ([0-9]*)\.(.*)'
+match = re.match(pattern, summary, flags=re.DOTALL)
+if match:
+    start_date = datetime.fromtimestamp(float(match.group(2)))
+    summary = re.sub(pattern, fr"\1 {int(now.timestamp())}.\3", summary, flags=re.DOTALL)
+else:
+    summary = f"{summary}\n\nLAST BOT RUN: {int(now.timestamp())}."
 
 for report in report_types:
     print(f"Working on {report['title']}")
     df = dw.fetch_file(report['filename'])
 
-    if not last_run_time:
+    if not match or df is None:
         df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
     else:
         df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
@@ -64,8 +60,9 @@ for report in report_types:
         else:
             print(f"No new data for {report['title']}")
 
-    df.drop_duplicates(subset=report['primary_key'], keep='last').to_csv(report['filename'], index=False)
-    dw.push(report['filename'])
+    if df is not None and not df.empty:
+        df.drop_duplicates(subset=report['primary_key'], keep='last').to_csv(report['filename'], index=False)
+        dw.push(report['filename'])
 
-dw.update_tags(tags)
+dw.update_summary(summary)
 print('Done!')

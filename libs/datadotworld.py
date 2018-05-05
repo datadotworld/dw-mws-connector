@@ -21,7 +21,9 @@ class Datadotworld:
     def fetch_file(self, filename):
         url = f'{BASE_DW_URL}/file_download/{self.dataset}/{filename}'
         r = requests.get(url, headers=self.headers)
-        if r.status_code != 200:
+        if r.status_code == 404:
+            return None
+        elif r.status_code != 200:
             print(f'Failed to download {filename} from data.world')
             r.raise_for_status()
         return pd.read_csv(StringIO(r.text))
@@ -35,9 +37,9 @@ class Datadotworld:
             r.raise_for_status()
         payload.close()
 
-    def update_tags(self, tags):
+    def update_summary(self, summary):
         url = f'{BASE_DW_URL}/datasets/{self.dataset}'
-        body = {'tags': tags}
+        body = {'summary': summary}
         r = requests.patch(url, headers=self.headers, json=body)
         if r.status_code != 200:
             print(f'Failed to update {self.dataset} with the tags: {tags}')
