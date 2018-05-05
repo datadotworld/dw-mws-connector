@@ -22,7 +22,7 @@ class Datadotworld:
         url = f'{BASE_DW_URL}/file_download/{self.dataset}/{filename}'
         r = requests.get(url, headers=self.headers)
         if r.status_code == 404:
-            return None
+            return pd.DataFrame()
         elif r.status_code != 200:
             print(f'Failed to download {filename} from data.world')
             r.raise_for_status()

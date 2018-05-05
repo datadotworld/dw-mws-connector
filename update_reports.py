@@ -56,7 +56,7 @@ for report in report_types:
     else:
         df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
         if df_new_data is not None:
-            df = df.append(df_new_data)
+            df = df.append(df_new_data, ignore_index=True)
         else:
             print(f"No new data for {report['title']}")
 

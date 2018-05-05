@@ -62,8 +62,8 @@ class MWS:
                                           end_date=end_date)
         counter = 0
         while True:
-            time.sleep(10)  # Delay here to prevent throttling & the reports are slow to compile
-            if counter > 12:  # Timeout after 120 seconds
+            time.sleep(20)  # Delay here to prevent throttling & the reports are very slow to compile
+            if counter > 6:  # Timeout after 120 seconds
                 raise Exception('Timeout while pulling from MWS')
 
             status, report_id = self._get_report_request_list(request_id)
@@ -86,7 +86,7 @@ class MWS:
 
         if not is_date_range_limited or (end_date - start_date).total_seconds() <= self.thirty_days:
             df_tmp = self._pull_single_report(report_type, start_date, end_date)
-            df.append(df_tmp, ignore_index=True)
+            df = df.append(df_tmp, ignore_index=True)
         else:
             dates = [start_date]
 
@@ -101,5 +101,5 @@ class MWS:
             for i in range(len(dates)):
                 if i < len(dates) - 1:
                     df_tmp = self._pull_single_report(report_type, start_date=dates[i], end_date=dates[i + 1])
-                    df.append(df_tmp, ignore_index=True)
+                    df = df.append(df_tmp, ignore_index=True)
         return df
