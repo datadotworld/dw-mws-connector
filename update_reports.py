@@ -2,6 +2,7 @@ import os
 import re
 from datetime import datetime
 
+import pandas as pd
 from libs.datadotworld import Datadotworld
 from libs.mws import MWS
 
@@ -49,11 +50,12 @@ else:
 
 for report in report_types:
     print(f"Working on {report['title']}")
-    df = dw.fetch_file(report['filename'])
+    df = pd.DataFrame()
 
     if not match or df is None:
         df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
     else:
+        df = dw.fetch_file(report['filename'])
         df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
         if df_new_data is not None:
             df = df.append(df_new_data, ignore_index=True)
