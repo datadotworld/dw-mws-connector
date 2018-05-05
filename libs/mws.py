@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import StringIO
 
 import mws as mws_api
@@ -19,8 +19,8 @@ class MWS:
 
     def request_report(self, report_type, start_date, end_date):
         r = self.reports_api.request_report(report_type=report_type,
-                                            start_date=start_date,
-                                            end_date=end_date,
+                                            start_date=start_date.isoformat(),
+                                            end_date=end_date.isoformat(),
                                             marketplaceids=self.marketplace_ids)
 
         try:
@@ -54,26 +54,22 @@ class MWS:
             raise
         return report
 
-    def pull_historical_data(self, report_type, record_start_date, end_date):
+    def pull_historical_data(self, report_type, start_date, end_date):
         df = pd.DataFrame()
+        dates = [start_date]
 
-        dates = []
-        dt = datetime.strptime(record_start_date, '%Y-%m-%d')
-        end_dt = datetime.strptime(end_date, '%Y-%m-%d')
-        dates.append(dt.isoformat())
         while True:
-            dt = dt + timedelta(days=30)
-            if dt < end_dt:
-                dates.append(dt.isoformat())
+            dt = dates[-1] + timedelta(days=30)
+            if dt < end_date:
+                dates.append(dt)
             else:
-                dates.append(end_dt.isoformat())
+                dates.append(end_date)
                 break
 
         for i in range(len(dates)):
             if i < len(dates) - 1:
                 df_tmp = self.pull_from_mws(report_type, start_date=dates[i], end_date=dates[i + 1])
                 df.append(df_tmp, ignore_index=True)
-
         return df
 
     def pull_from_mws(self, report_type, start_date, end_date):
@@ -94,7 +90,6 @@ class MWS:
             counter += 1
 
         raw_report = self.get_report(report_id) if report_id else None
-
         if raw_report:
             f = StringIO(raw_report)
             return pd.read_csv(f, sep='\t')

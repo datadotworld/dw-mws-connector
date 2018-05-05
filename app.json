@@ -7,9 +7,6 @@
   "keywords": ["data.world", "amazon", "mws", "etl"],
   "addons": [
     {
-      "plan": "redistogo:nano"
-    },
-    {
       "plan": "scheduler:standard"
     }
   ],
@@ -20,6 +17,9 @@
     "DW_DATASET": {
       "description": "data.world dataset. Format: owner/dataset-id"
     },
+    "START_DATE": {
+      "description": "How far back to pull data. Format: 2017-01-01"
+    },
     "ALL_ORDERS_FILENAME": {
       "description": "Name of the file for all the orders",
       "value": "AmazonAllOrders.csv"
@@ -27,9 +27,6 @@
     "CUSTOMER_RETURNS_FILENAME": {
       "description": "Name of the file for the customer returns",
       "value": "AmazonFBAFulfillmentCustomerReturns.csv"
-    },
-    "RECORD_START_DATE": {
-      "description": "How far back to pull data from. Format: 2017-01-01"
     },
     "MWS_ACCESS_KEY": {
       "description": "The Access Key that you received when you registered for Amazon MWS"
