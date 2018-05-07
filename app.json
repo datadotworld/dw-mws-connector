@@ -22,12 +22,10 @@
     },
     "ALL_ORDERS_FILENAME": {
       "description": "Name of the file for all the orders",
-      "value": "AmazonAllOrders.csv",
       "required": false
     },
     "CUSTOMER_RETURNS_FILENAME": {
       "description": "Name of the file for the customer returns",
-      "value": "AmazonFBAFulfillmentCustomerReturns.csv",
       "required": false
     },
     "MWS_ACCESS_KEY": {
