@@ -10,6 +10,9 @@
       "plan": "scheduler:standard"
     }
   ],
+  "scripts": {
+    "postdeploy": "python update_reports.py"
+  },
   "env": {
     "DW_TOKEN": {
       "description": "data.world API token from https://data.world/settings/advanced"
