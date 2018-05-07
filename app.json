@@ -21,11 +21,11 @@
       "description": "How far back to pull data. Format: 2017-01-01"
     },
     "ALL_ORDERS_FILENAME": {
-      "description": "Name of the file for all the orders",
+      "description": "Name of the file for all the orders, e.g. AmazonAllOrders.csv",
       "required": false
     },
     "CUSTOMER_RETURNS_FILENAME": {
-      "description": "Name of the file for the customer returns",
+      "description": "Name of the file for the customer returns, e.g. AmazonFBAFulfillmentCustomerReturns.csv",
       "required": false
     },
     "MWS_ACCESS_KEY": {

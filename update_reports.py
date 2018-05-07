@@ -18,14 +18,14 @@ marketplace_ids = tuple(os.environ['MWS_MARKETPLACE_IDS'].replace(' ', '').split
 report_types = [
     {
         'title': 'All Orders Report',
-        'filename': os.environ['ALL_ORDERS_FILENAME'],
+        'filename': os.environ.get('ALL_ORDERS_FILENAME', None),
         'initial_endpoint': '_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_',
         'update_endpoint': '_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_',
         'primary_key': 'amazon-order-id',
         'is_date_range_limited': True,  # Endpoint can only pull 30 days of data
     }, {
         'title': 'FBA Returns Report',
-        'filename': os.environ['CUSTOMER_RETURNS_FILENAME'],
+        'filename': os.environ.get('CUSTOMER_RETURNS_FILENAME', None),
         'initial_endpoint': '_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_',
         'update_endpoint': '_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_',
         'primary_key': 'order-id',
