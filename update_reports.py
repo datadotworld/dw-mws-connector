@@ -49,22 +49,23 @@ else:
     summary = f"{summary}\n\nLAST BOT RUN: {int(now.timestamp())}."
 
 for report in report_types:
-    print(f"Working on {report['title']}")
-    df = pd.DataFrame()
+    if report['filename']:
+        print(f"Working on {report['title']}")
+        df = pd.DataFrame()
 
-    if not match or df is None:
-        df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
-    else:
-        df = dw.fetch_file(report['filename'])
-        df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
-        if df_new_data is not None:
-            df = df.append(df_new_data, ignore_index=True)
+        if not match or df is None:
+            df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
         else:
-            print(f"No new data for {report['title']}")
+            df = dw.fetch_file(report['filename'])
+            df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
+            if df_new_data is not None:
+                df = df.append(df_new_data, ignore_index=True)
+            else:
+                print(f"No new data for {report['title']}")
 
-    if df is not None and not df.empty:
-        df.drop_duplicates(subset=report['primary_key'], keep='last').to_csv(report['filename'], index=False)
-        dw.push(report['filename'])
+        if df is not None and not df.empty:
+            df.drop_duplicates(subset=report['primary_key'], keep='last').to_csv(report['filename'], index=False)
+            dw.push(report['filename'])
 
 if not mws.error_occurred:
     dw.update_summary(summary)

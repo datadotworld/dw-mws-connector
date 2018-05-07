@@ -14,6 +14,7 @@
  * Your credentials for Amazon MWS are provided when you register as a developer. Instructions for doing so are
  available [here](http://docs.developer.amazonservices.com/en_US/dev_guide/DG_Registering.html).
  * `START_DATE:` How far back to pull data. Format: `2017-01-01`
+ * To skip a report, ensure that the associated `_FILENAME` variable is blank
  * `MARKETPLACE_IDS:` Marketplace IDs for the marketplaces you are registered to sell in. Potential values can
  be found [here](http://docs.developer.amazonservices.com/en_US/dev_guide/DG_Endpoints.html).
  

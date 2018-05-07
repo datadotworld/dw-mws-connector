@@ -15,7 +15,7 @@ class MWS:
             account_id=seller_id,
             auth_token=auth_token,
         )
-        self.thirty_days = 2592000.0
+        self.thirty_days = 2592000.0  # Seconds
         self.error_occurred = False
 
     def _request_report(self, report_type, start_date, end_date):
