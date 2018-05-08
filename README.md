@@ -7,15 +7,15 @@
 1. [Create a dataset](https://data.world/create-a-dataset) on data.world
 2. You will need your own [Heroku](https://www.heroku.com) account
 3. Deploy to Heroku by pressing the fancy-looking button above
-  * This integration allows you to save all of the reports into one dataset or to multiple datasets. For the latter,
+    * This integration allows you to save all of the reports into one dataset or to multiple datasets. For the latter,
   take a look at the [Storing Reports to Multiple Datasets](#storing-reports-in-multiple-datasets) section.
-  * `App name` is optional as one will be automatically assigned, but we recommend something descriptive
-  * Take a look at the [Config Vars](#config-vars) section for more details on the individual configuration variables
-  * The initial deployment will take a couple of minutes as it's pulling your historical data
+    * `App name` is optional as one will be automatically assigned, but we recommend something descriptive
+    * Take a look at the [Config Vars](#config-vars) section for more details on the individual configuration variables
+    * The initial deployment will take a couple of minutes as it's pulling your historical data
 4. Once deployment is done, click on 'Manage App' to go to the app's 'Overview' page
 5. Under 'Installed add-ons', click on 'Heroku Scheduler'
-6. Add a new job. The command to use is 'update_reports'.
-  * Note that times are in UTC. Use a timezone converter if you would like it to run at a specific local time
+6. Add a new job. The command to use is `update_reports`.
+    * Note that times are in UTC. Use a timezone converter if you would like it to run at a specific local time.
 
 The following job is scheduled to run daily at 8 AM CDT:
 ![Daily Job](assets/scheduler-daily-job.png)
@@ -45,8 +45,8 @@ This is a good option when you have a ton of data and you're concerned about blo
 
 ### Known Issues
 
- * This integration currently only supports two report types: All Orders Report and FBA Returns Report. Additional
- reports can be requested through data.world support or added by forking this repository and submitting a pull request.
+This integration currently only supports two report types: All Orders and FBA Returns. Additional reports can be
+requested through data.world [support](#support), or added by forking this repository and submitting a pull request.
 
 ### Support
 
