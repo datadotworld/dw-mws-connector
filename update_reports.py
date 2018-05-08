@@ -37,15 +37,15 @@ mws = MWS(access_key, secret_key, seller_id, auth_token, marketplace_ids)
 
 dataset = dw.fetch_dataset()
 summary = dataset['summary'] if 'summary' in dataset else ''
-now = datetime.now().replace(microsecond=0)
+now = datetime.utcnow().replace(microsecond=0)
 
-pattern = r'(.*LAST BOT RUN:) ([0-9]*)\.(.*)'
+pattern = r'(.*LAST BOT RUN:) (.*) UTC(.*)'
 match = re.match(pattern, summary, flags=re.DOTALL)
 if match:
-    start_date = datetime.fromtimestamp(float(match.group(2)))
-    summary = re.sub(pattern, fr"\1 {int(now.timestamp())}.\3", summary, flags=re.DOTALL)
+    start_date = datetime.strptime(match.group(2), '%Y-%m-%dT%H:%M:%S')
+    summary = re.sub(pattern, fr"\1 {now.isoformat()} UTC\3", summary, flags=re.DOTALL)
 else:
-    summary = f"{summary}\n\nLAST BOT RUN: {int(now.timestamp())}."
+    summary = f"{summary}\n\nLAST BOT RUN: {now.isoformat()} UTC\n\n"
 
 for report in report_types:
     if report['filename']:
