@@ -14,22 +14,25 @@
     "postdeploy": "python update_reports.py"
   },
   "env": {
+    "ALL_ORDERS_FILENAME": {
+      "description": "Name of the file for the All Orders Report, e.g. AmazonAllOrders.csv",
+      "required": false
+    },
+    "CUSTOMER_RETURNS_FILENAME": {
+      "description": "Name of the file for the FBA Returns Report, e.g. AmazonFBAFulfillmentCustomerReturns.csv",
+      "required": false
+    },
+    "START_DATE": {
+      "description": "How far back to pull data. Format: 2017-01-01"
+    },
     "DW_TOKEN": {
       "description": "data.world API token from https://data.world/settings/advanced"
     },
     "DW_DATASET_SLUG": {
       "description": "data.world dataset. Format: owner/dataset-id"
     },
-    "START_DATE": {
-      "description": "How far back to pull data. Format: 2017-01-01"
-    },
-    "ALL_ORDERS_FILENAME": {
-      "description": "Name of the file for all the orders, e.g. AmazonAllOrders.csv",
-      "required": false
-    },
-    "CUSTOMER_RETURNS_FILENAME": {
-      "description": "Name of the file for the customer returns, e.g. AmazonFBAFulfillmentCustomerReturns.csv",
-      "required": false
+    "MWS_MARKETPLACE_IDS": {
+      "description": "Marketplace IDs you're registered to sell in. Can be a single value or a comma-separated list: ATVPDKIKX0DER,A2EUQ1WTGCTBG2"
     },
     "MWS_ACCESS_KEY": {
       "description": "The Access Key that you received when you registered for Amazon MWS"
@@ -42,9 +45,6 @@
     },
     "MWS_AUTH_TOKEN": {
       "description": "The authorization token that you received when you registered for Amazon MWS"
-    },
-    "MWS_MARKETPLACE_IDS": {
-      "description": "Marketplace IDs you're registered to sell in. Can be a single value or a comma-separated list: ABCDGEFG,OPQRSTUV"
     }
   }
 }
