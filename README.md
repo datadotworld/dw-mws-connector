@@ -17,7 +17,7 @@
 6. Add a new job. The command to use is `update_reports`.
     * Note that times are in UTC. Use a timezone converter if you would like your job to run at a specific local time.
 
-The following job is scheduled to run daily at 8 AM CDT:
+As an example, the following job is scheduled to run daily at 8 AM CDT:
 ![Daily Job](assets/scheduler-daily-job.png)
 
 ### Storing Reports in Multiple Datasets
@@ -33,8 +33,8 @@ This is a good option when you have a ton of data and you're concerned about blo
  * The various `_FILENAME` variables determine both the name of the files, as well as which reports to place on that
  dataset. To skip a report, simply leave the name blank.
  * `START_DATE:` How far back to pull your historical data. Format: `2017-01-01`
- * `DW_TOKEN`: Pay a visit to https://data.world/settings/advanced and copy the Read/Write token
- * `DW_DATASET_SLUG`: As an example, if the URL of your dataset were `https://data.world/my-org/my-cool-dataset`,
+ * `DW_TOKEN:` Pay a visit to https://data.world/settings/advanced and copy the Read/Write token
+ * `DW_DATASET_SLUG:` As an example, if the URL of your dataset were `https://data.world/my-org/my-cool-dataset`,
  the dataset slug would be `my-org/my-cool-dataset`
  * `MARKETPLACE_IDS:` Marketplace IDs for the marketplaces you are registered to sell in. For the US market, use
  `ATVPDKIKX0DER`. Values for other markets can be found
