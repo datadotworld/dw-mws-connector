@@ -46,8 +46,9 @@ This is a good option when you have a ton of data and you're concerned about blo
 ### Known Issues
 
 This integration currently only supports two report types: All Orders and FBA Returns. Additional reports can be
-requested through data.world [support](#support), or added by forking this repository and submitting a pull request.
+requested through [data.world support](#support), or added by forking this repository and submitting a pull request.
 
 ### Support
 
-For support, either create a new issue here on GitHub, or send an email to help@data.world.
+For support, either create a [new issue](https://github.com/datadotworld/heroku-dw-mws-connector/issues) here on
+GitHub, or send an email to help@data.world.
