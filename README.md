@@ -1,6 +1,6 @@
 # data.world & Amazon Marketplace Web Service (MWS) Connector
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/datadotworld/heroku-dw-mws-connector)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/datadotworld/dw-mws-connector)
 
 ## Getting Started
 
@@ -50,5 +50,5 @@ requested through [data.world support](#support), or added by forking this repos
 
 ### Support
 
-For support, either create a [new issue](https://github.com/datadotworld/heroku-dw-mws-connector/issues) here on
+For support, either create a [new issue](https://github.com/datadotworld/dw-mws-connector/issues) here on
 GitHub, or send an email to help@data.world.
