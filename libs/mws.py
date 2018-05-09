@@ -70,6 +70,7 @@ class MWS:
                 break
             elif status == '_CANCELLED_':
                 print(f'Request {request_id} was cancelled, skipping report')
+                self.error_occurred = True
                 break
             counter += 1
 
