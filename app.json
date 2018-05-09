@@ -1,9 +1,9 @@
 {
   "name": "data.world & MWS Connector",
   "description": "Pulls data from your Amazon MWS account and pushes it to a data.world dataset",
-  "repository": "https://github.com/datadotworld/heroku-dw-mws-connector",
+  "repository": "https://github.com/datadotworld/dw-mws-connector",
   "website": "https://data.world",
-  "logo": "https://github.com/datadotworld/heroku-dw-mws-connector/raw/master/assets/ceo-sparkle.png",
+  "logo": "https://github.com/datadotworld/dw-mws-connector/raw/master/assets/ceo-sparkle.png",
   "keywords": ["data.world", "amazon", "mws", "etl"],
   "addons": [
     {
