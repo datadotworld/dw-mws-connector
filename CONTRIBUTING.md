@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-## General
+### General
 
 * Contributions of all kinds (issues, ideas, proposals), not just code, are highly appreciated.
 * Pull requests are welcome with the understanding that major changes will be carefully evaluated

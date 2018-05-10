@@ -48,7 +48,7 @@ This is a good option when you have a ton of data and you're concerned about blo
 This integration currently only supports two report types: All Orders and FBA Returns. Additional reports can be
 requested through [data.world support](#support), or added by forking this repository and submitting a pull request.
 
-##$ Contributing
+### Contributing
 
 This integration has been released as an open-source project. Community participation is encouraged and highly
 appreciated. If you'd like to contribute, please follow the [Contributing Guidelines](CONTRIBUTING.md).
