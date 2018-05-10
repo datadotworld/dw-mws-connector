@@ -1,18 +1,18 @@
 # Contributing Guidelines
 
-### General
+## General
 
 * Contributions of all kinds (issues, ideas, proposals), not just code, are highly appreciated.
 * Pull requests are welcome with the understanding that major changes will be carefully evaluated
 and discussed, and may not always be accepted. Starting with a discussion is always best!
 * All contributions including documentation, filenames and discussions should be written in the English language.
 
-### Issues
+## Issues
 
 Our [issue tracker](https://github.com/datadotworld/dw-mws-connector/issues) can be used to report issues and
 propose changes to the current or next version of this connector.
 
-# Contribute Code
+## Contribute Code
 
 ### Relevant Docs
 
@@ -74,5 +74,5 @@ git push origin my-feature-branch
 Go to https://github.com/[YOUR_GITHUB_NAME]/dw-mws-connector.git and select your feature branch. Click the
 'Pull Request' button and fill out the form. Pull requests are usually reviewed within a few days.
 
-### Thank you!
+## Thank you!
 Thank you in advance for contributing to this project!
