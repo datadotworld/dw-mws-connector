@@ -16,7 +16,7 @@ propose changes to the current or next version of this connector.
 
 ### Relevant Docs
 
-[Amazon MWS API Reference](http://docs.developer.amazonservices.com/en_US/reports/Reports_Overview.html)
+[Amazon MWS API Reference](http://docs.developer.amazonservices.com/en_US/reports/Reports_Overview.html)  
 [data.world API Reference](https://apidocs.data.world/)
 
 ### Fork the Project
