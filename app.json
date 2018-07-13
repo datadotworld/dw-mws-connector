@@ -22,6 +22,10 @@
       "description": "Name of the file for the FBA Returns Report, e.g. AmazonFBAFulfillmentCustomerReturns.csv",
       "required": false
     },
+    "FULFILLED_SHIPMENTS_FILENAME": {
+      "description": "Name of the file for the FBA Fulfilled Shipments Report, e.g. AmazonFBAFulfilledShipments.csv",
+      "required": false
+    },
     "START_DATE": {
       "description": "How far back to pull data. Format: 2017-01-01"
     },

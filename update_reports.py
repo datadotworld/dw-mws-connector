@@ -47,6 +47,12 @@ report_types = [
         'endpoint': '_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_',
         'primary_key': 'order-id',
         'is_date_range_limited': False,
+    }, {
+        'title': 'FBA Fulfilled Shipments Report',
+        'filename': os.environ.get('FULFILLED_SHIPMENTS_FILENAME', None),
+        'endpoint': '_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_',
+        'primary_key': 'order-id',
+        'is_date_range_limited': True,
     }]
 
 dw = Datadotworld(dw_token, dataset_slug)
