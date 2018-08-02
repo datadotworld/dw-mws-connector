@@ -68,7 +68,7 @@ class MWS:
         r = self.reports_api.get_report(report_id)
 
         try:
-            report = r.original.decode()
+            report = r.original.decode(encoding='ISO-8859-1')
         except Exception:
             print(f'GetReport failed for {report_id}')
             raise
