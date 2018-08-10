@@ -80,8 +80,8 @@ class MWS:
                                           end_date=end_date)
         counter = 0
         while True:
-            time.sleep(30)  # Delay here to prevent throttling & the reports are very slow to compile
-            if counter > 4:  # Timeout after 120 seconds
+            time.sleep(60)  # Delay here to prevent throttling & the reports are very slow to compile
+            if counter == 2:  # Timeout at 180 seconds
                 raise Exception('Timeout while pulling from MWS')
 
             status, report_id = self._get_report_request_list(request_id)
