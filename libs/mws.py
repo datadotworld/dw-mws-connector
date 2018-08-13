@@ -68,7 +68,7 @@ class MWS:
         r = self.reports_api.get_report(report_id)
 
         try:
-            report = r.original.decode()
+            report = r.original.decode(encoding='ISO-8859-1')
         except Exception:
             print(f'GetReport failed for {report_id}')
             raise
@@ -80,9 +80,10 @@ class MWS:
                                           end_date=end_date)
         counter = 0
         while True:
-            time.sleep(30)  # Delay here to prevent throttling & the reports are very slow to compile
-            if counter > 4:  # Timeout after 120 seconds
+            if counter == 5:  # Timeout at 300 seconds
                 raise Exception('Timeout while pulling from MWS')
+
+            time.sleep(60)  # Delay here to prevent throttling & the reports are very slow to compile
 
             status, report_id = self._get_report_request_list(request_id)
             if status in ('_DONE_', '_DONE_NO_DATA_'):

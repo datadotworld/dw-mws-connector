@@ -61,5 +61,5 @@ class Datadotworld:
         body = {'summary': summary}
         r = requests.patch(url, headers=self.headers, json=body)
         if r.status_code != 200:
-            print(f'Failed to update {self.dataset} with the tags: {tags}')
+            print(f'Failed to update {self.dataset} with the summary: {summary}')
             r.raise_for_status()
