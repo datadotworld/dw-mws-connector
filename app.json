@@ -30,7 +30,8 @@
       "description": "How far back to pull data. Format: 2017-01-01"
     },
     "LAST_THIRTY_DAYS": {
-      "description": "If the value is set to TRUE, it will always pull the last 30 days of data"
+      "description": "If the value is set to TRUE, it will always pull the last 30 days of data",
+      "required": false
     },
     "DW_TOKEN": {
       "description": "data.world API token from https://data.world/settings/advanced"

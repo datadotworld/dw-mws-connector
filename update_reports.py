@@ -34,7 +34,7 @@ seller_id = os.environ['MWS_SELLER_ID']
 auth_token = os.environ['MWS_AUTH_TOKEN']
 marketplace_ids = tuple(os.environ['MWS_MARKETPLACE_IDS'].replace(' ', '').split(','))
 
-last_thirty_days = os.environ.get(['LAST_THIRTY_DAYS'], None)
+last_thirty_days = os.environ.get('LAST_THIRTY_DAYS', None)
 if last_thirty_days and last_thirty_days.lower() in ('y', 'yes', 't', 'true'):
     start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=30)
 
