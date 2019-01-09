@@ -27,7 +27,6 @@ from libs.mws import MWS
 dw_token = os.environ['DW_TOKEN']
 dataset_slug = os.environ['DW_DATASET_SLUG']
 
-start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
 access_key = os.environ['MWS_ACCESS_KEY']
 secret_key = os.environ['MWS_SECRET_KEY']
 seller_id = os.environ['MWS_SELLER_ID']
@@ -35,8 +34,6 @@ auth_token = os.environ['MWS_AUTH_TOKEN']
 marketplace_ids = tuple(os.environ['MWS_MARKETPLACE_IDS'].replace(' ', '').split(','))
 
 last_thirty_days = os.environ.get('LAST_THIRTY_DAYS', None)
-if last_thirty_days and last_thirty_days.lower() in ('y', 'yes', 't', 'true'):
-    start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=30)
 
 report_types = [
     {
@@ -73,8 +70,6 @@ pattern = r'(.*LAST BOT RUN:) (.*) UTC(.*)'
 match = re.match(pattern, summary, flags=re.DOTALL)
 current_time = now.isoformat()
 if match:
-    # Intentionally overlap dates to make sure nothing is missed, requires de-duping
-    start_date = datetime.strptime(match.group(2), '%Y-%m-%dT%H:%M:%S') - timedelta(days=5)
     summary = re.sub(pattern, fr"\1 {current_time} UTC\3", summary, flags=re.DOTALL)
 else:
     summary = f"{summary}\n\nLAST BOT RUN: {current_time} UTC\n\n"
@@ -85,12 +80,18 @@ for report in report_types:
         df = dw.fetch_file(report['filename'])
 
         # For compatibility with older implementations
-        if 'script-run-time' not in df.columns:
+        if df is not None and 'script-run-time' not in df.columns:
             df['script-run-time'] = match.group(2)
 
-        if not match or df is None:
+        if last_thirty_days and last_thirty_days.lower() in ('y', 'yes', 't', 'true'):
+            start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=30)
+            df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
+        elif not match or df is None:
+            start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
             df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
         else:
+            # Intentionally overlap dates to make sure nothing is missed, requires de-duping
+            start_date = datetime.strptime(match.group(2), '%Y-%m-%dT%H:%M:%S') - timedelta(days=5)
             df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
             if df_new_data is not None:
                 df_new_data['script-run-time'] = current_time
