@@ -98,7 +98,7 @@ for report in report_types:
                 df = df.append(df_new_data, ignore_index=True)
 
                 # Remove duplicates by keeping entries from newest 'script-run-time' group
-                df_maxes = df.groupby('amazon-order-id', sort=False)['script-run-time'].transform(max)
+                df_maxes = df.groupby(report['primary_key'], sort=False)['script-run-time'].transform(max)
                 df = df.loc[df['script-run-time'] == df_maxes]
             else:
                 print(f"No new data for {report['title']}")
