@@ -42,19 +42,22 @@ report_types = [
     {
         'title': 'All Orders Report',
         'filename': os.environ.get('ALL_ORDERS_FILENAME', None),
-        'endpoint': '_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_',
+        'initial_endpoint': '_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_',
+        'update_endpoint': '_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_',
         'primary_key': 'amazon-order-id',
         'is_date_range_limited': True,  # Endpoint can only pull 30 days of data
     }, {
         'title': 'FBA Returns Report',
         'filename': os.environ.get('CUSTOMER_RETURNS_FILENAME', None),
-        'endpoint': '_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_',
+        'initial_endpoint': '_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_',
+        'update_endpoint': '_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_',
         'primary_key': 'order-id',
         'is_date_range_limited': False,
     }, {
         'title': 'FBA Fulfilled Shipments Report',
         'filename': os.environ.get('FULFILLED_SHIPMENTS_FILENAME', None),
-        'endpoint': '_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_',
+        'initial_endpoint': '_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_',
+        'update_endpoint': '_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_',
         'primary_key': 'amazon-order-id',
         'is_date_range_limited': True,
     }]
@@ -68,15 +71,36 @@ now = datetime.utcnow().replace(microsecond=0)
 
 pattern = r'(.*LAST BOT RUN:) (.*) UTC(.*)'
 match = re.match(pattern, summary, flags=re.DOTALL)
+current_time = now.isoformat()
 if match:
-    summary = re.sub(pattern, fr"\1 {now.isoformat()} UTC\3", summary, flags=re.DOTALL)
+    # Intentionally overlap dates to make sure nothing is missed, requires de-duping
+    start_date = datetime.strptime(match.group(2), '%Y-%m-%dT%H:%M:%S') - timedelta(days=5)
+    summary = re.sub(pattern, fr"\1 {current_time} UTC\3", summary, flags=re.DOTALL)
 else:
-    summary = f"{summary}\n\nLAST BOT RUN: {now.isoformat()} UTC\n\n"
+    summary = f"{summary}\n\nLAST BOT RUN: {current_time} UTC\n\n"
 
 for report in report_types:
     if report['filename']:
         print(f"Working on {report['title']}")
-        df = mws.pull_report(report['endpoint'], report['is_date_range_limited'], start_date, now)
+        df = dw.fetch_file(report['filename'])
+
+        # For compatibility with older implementations
+        if 'script-run-time' not in df.columns:
+            df['script-run-time'] = match.group(2)
+
+        if not match or df is None:
+            df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
+        else:
+            df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
+            if df_new_data is not None:
+                df_new_data['script-run-time'] = current_time
+                df = df.append(df_new_data, ignore_index=True)
+
+                # Remove duplicates by keeping entries from newest 'script-run-time' group
+                df_maxes = df.groupby('amazon-order-id', sort=False)['script-run-time'].transform(max)
+                df = df.loc[df['script-run-time'] == df_maxes]
+            else:
+                print(f"No new data for {report['title']}")
 
         if df is not None and not df.empty:
             df.to_csv(report['filename'], index=False)
