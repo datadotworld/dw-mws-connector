@@ -79,21 +79,23 @@ for report in report_types:
         print(f"Working on {report['title']}")
         df = dw.fetch_file(report['filename'])
 
-        # For compatibility with older implementations
-        if df is not None and 'script-run-time' not in df.columns:
-            df['script-run-time'] = match.group(2)
-
         if last_thirty_days and last_thirty_days.lower() in ('y', 'yes', 't', 'true'):
             start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=30)
             df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
+            df['script-run-time'] = match.group(2)
         elif not match or df is None:
             start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
             df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
+            df['script-run-time'] = match.group(2)
         else:
             # Intentionally overlap dates to make sure nothing is missed, requires de-duping
             start_date = datetime.strptime(match.group(2), '%Y-%m-%dT%H:%M:%S') - timedelta(days=5)
             df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
             if df_new_data is not None:
+                # For compatibility with older implementations
+                if 'script-run-time' not in df.columns:
+                    df['script-run-time'] = match.group(2)
+
                 df_new_data['script-run-time'] = current_time
                 df = df.append(df_new_data, ignore_index=True)
 
