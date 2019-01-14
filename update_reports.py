@@ -70,26 +70,34 @@ pattern = r'(.*LAST BOT RUN:) (.*) UTC(.*)'
 match = re.match(pattern, summary, flags=re.DOTALL)
 current_time = now.isoformat()
 if match:
+    print(f"Found a 'last bot run' entry in the dataset ({dataset_slug}): {match[2]}")
     summary = re.sub(pattern, fr"\1 {current_time} UTC\3", summary, flags=re.DOTALL)
 else:
+    print(f"No 'last bot run' entry found in the dataset ({dataset_slug})")
     summary = f"{summary}\n\nLAST BOT RUN: {current_time} UTC\n\n"
 
 for report in report_types:
     if report['filename']:
         print(f"Working on {report['title']}")
         df = dw.fetch_file(report['filename'])
+        if df is None:
+            print('No existing data found in the dataset')
 
         if last_thirty_days and last_thirty_days.lower() in ('y', 'yes', 't', 'true'):
+            print('LAST_THIRTY_DAYS flag is set')
             start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=30)
             df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
             df['script-run-time'] = match.group(2)
         elif not match or df is None:
+            print('Fetching data from Amazon from START_DATE')
             start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
             df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
             df['script-run-time'] = match.group(2)
         else:
             # Intentionally overlap dates to make sure nothing is missed, requires de-duping
             start_date = datetime.strptime(match.group(2), '%Y-%m-%dT%H:%M:%S') - timedelta(days=5)
+
+            print(f'Fetching data from Amazon from {start_date.isoformat()} to {current_time}')
             df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
             if df_new_data is not None:
                 # For compatibility with older implementations
@@ -107,8 +115,11 @@ for report in report_types:
 
         if df is not None and not df.empty:
             df.to_csv(report['filename'], index=False)
+
+            print(f"Pushing {report['filename']} to data.world")
             dw.push(report['filename'])
 
 if not mws.error_occurred:
+    print('Updating summary')
     dw.update_summary(summary)
 print('Done!')
