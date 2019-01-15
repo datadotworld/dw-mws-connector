@@ -17,9 +17,8 @@
 # This product includes software developed at
 # data.world, Inc.(http://data.world/).
 
-from io import StringIO
+import os
 
-import pandas as pd
 import requests
 
 BASE_DW_URL = 'https://api.data.world/v0'
@@ -37,24 +36,28 @@ class Datadotworld:
             raise Exception(f"Dataset '{self.dataset}' doesn't exist, please create it: data.world/create-a-dataset")
         return r.json()
 
+    # Downloads a file from a data.world dataset
+    # Returns the size of the file, '0' if no file is found
     def fetch_file(self, filename):
         url = f'{BASE_DW_URL}/file_download/{self.dataset}/{filename}'
-        r = requests.get(url, headers=self.headers)
+        r = requests.get(url, headers=self.headers, stream=True)
         if r.status_code == 404:
-            return pd.DataFrame()
+            return 0
         elif r.status_code != 200:
             print(f'Failed to download {filename} from data.world')
             r.raise_for_status()
-        return pd.read_csv(StringIO(r.text))
+        with open(filename, 'wb') as f:
+            for block in r.iter_content(1024):
+                f.write(block)
+        return os.path.getsize(filename)
 
     def push(self, filename):
         url = f'{BASE_DW_URL}/uploads/{self.dataset}/files/{filename}'
-        payload = open(filename, 'rb')
-        r = requests.put(url, headers=self.headers, data=payload)
-        if r.status_code != 200:
-            print(f'Failed to upload {filename} to data.world')
-            r.raise_for_status()
-        payload.close()
+        with open(filename, 'rb') as f:
+            r = requests.put(url, headers=self.headers, data=f)
+            if r.status_code != 200:
+                print(f'Failed to upload {filename} to data.world')
+                r.raise_for_status()
 
     def update_summary(self, summary):
         url = f'{BASE_DW_URL}/datasets/{self.dataset}'

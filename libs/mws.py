@@ -97,16 +97,18 @@ class MWS:
         raw_report = self._get_report(report_id) if report_id else None
         if raw_report:
             f = StringIO(raw_report)
-            return pd.read_csv(f, sep='\t')
+            filename = f'{end_date}.mws.tmp'
+            pd.read_csv(f, sep='\t').to_csv(filename, index=False)
+            return filename
         else:
             return None
 
-    def pull_report(self, report_type, is_date_range_limited, start_date, end_date):
-        df = pd.DataFrame()
-
+    def pull_reports(self, report_type, is_date_range_limited, start_date, end_date):
+        filenames = list()
         if not is_date_range_limited or (end_date - start_date).total_seconds() <= self.thirty_days:
-            df_tmp = self._pull_single_report(report_type, start_date, end_date)
-            df = df.append(df_tmp, ignore_index=True)
+            filename = self._pull_single_report(report_type, start_date, end_date)
+            if filename:
+                filenames.append(filename)
         else:
             dates = [start_date]
 
@@ -120,6 +122,7 @@ class MWS:
 
             for i in range(len(dates)):
                 if i < len(dates) - 1:
-                    df_tmp = self._pull_single_report(report_type, start_date=dates[i], end_date=dates[i + 1])
-                    df = df.append(df_tmp, ignore_index=True)
-        return df
+                    filename = self._pull_single_report(report_type, start_date=dates[i], end_date=dates[i + 1])
+                    if filename:
+                        filenames.append(filename)
+        return filenames

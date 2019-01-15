@@ -19,7 +19,10 @@
 
 import os
 import re
+import shutil
 from datetime import datetime, timedelta
+
+import pandas as pd
 
 from libs.datadotworld import Datadotworld
 from libs.mws import MWS
@@ -77,45 +80,66 @@ else:
     summary = f"{summary}\n\nLAST BOT RUN: {current_time} UTC\n\n"
 
 for report in report_types:
+    def pull_reports_and_append(start_date):
+        filenames = mws.pull_reports(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
+        if filenames:
+            for filename in filenames:
+                with open(filename, 'rb') as f_in, open(report['filename'], 'ab') as f_out:
+                    f_out.write(f_in.read())
+
     if report['filename']:
         print(f"Working on {report['title']}")
-        df = dw.fetch_file(report['filename'])
-        if df is None:
-            print('No existing data found in the dataset')
+        filesize = dw.fetch_file(report['filename'])
+        if filesize > 0:
+            print(f"{report['filename']} found in the dataset, size: {filesize} bytes")
+        else:
+            print(f"{report['filename']} not found in the dataset")
 
         if last_thirty_days and last_thirty_days.lower() in ('y', 'yes', 't', 'true'):
             print('LAST_THIRTY_DAYS flag is set')
             start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=30)
-            df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
-            df['script-run-time'] = match.group(2)
-        elif not match or df is None:
+            pull_reports_and_append(start_date)
+        elif not match or filesize == 0:
             print('Fetching data from Amazon from START_DATE')
             start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
-            df = mws.pull_report(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
-            df['script-run-time'] = match.group(2)
+            pull_reports_and_append(start_date)
         else:
             # Intentionally overlap dates to make sure nothing is missed, requires de-duping
             start_date = datetime.strptime(match.group(2), '%Y-%m-%dT%H:%M:%S') - timedelta(days=5)
 
             print(f'Fetching data from Amazon from {start_date.isoformat()} to {current_time}')
-            df_new_data = mws.pull_report(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
-            if df_new_data is not None:
-                # For compatibility with older implementations
-                if 'script-run-time' not in df.columns:
-                    df['script-run-time'] = match.group(2)
+            filenames = mws.pull_reports(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
+            if filenames:
+                original_file = '.original'
+                shutil.copyfile(report['filename'], original_file)
+                original_list_of_keys = []
+                indexes_to_remove = []
+                for chunk in pd.read_csv(original_file, chunksize=1000):
+                    original_list_of_keys += chunk[report['primary_key']].values.tolist()
 
-                df_new_data['script-run-time'] = current_time
-                df = df.append(df_new_data, ignore_index=True)
+                # Determine which lines need to be removed from the original list
+                for filename in filenames:
+                    df = pd.read_csv(filename, usecols=[report['primary_key']])
+                    for key_from_new_file in df[report['primary_key']]:
+                        if key_from_new_file in original_list_of_keys:
+                            for i, key_from_original_list in enumerate(original_list_of_keys):
+                                if key_from_new_file == key_from_original_list:
+                                    indexes_to_remove.append(i)
 
-                # Remove duplicates by keeping entries from newest 'script-run-time' group
-                df_maxes = df.groupby(report['primary_key'], sort=False)['script-run-time'].transform(max)
-                df = df.loc[df['script-run-time'] == df_maxes]
+                # Create a new file that excludes primary keys found in the new files
+                with open(original_file) as f_in, open(report['filename'], 'w') as f_out:
+                    for i, line in f_in:
+                        if i not in indexes_to_remove:
+                            f_out.write(line)
+
+                with open(report['filename'], 'ab') as f_out:
+                    for filename in filenames:
+                        with open(filename, 'rb') as f_in:
+                            f_out.write(f_in.read())
             else:
                 print(f"No new data for {report['title']}")
 
-        if df is not None and not df.empty:
-            df.to_csv(report['filename'], index=False)
-
+        if os.path.exists(report['filename']) and os.path.getsize(report['filename']) > filesize:
             print(f"Pushing {report['filename']} to data.world")
             dw.push(report['filename'])
 
