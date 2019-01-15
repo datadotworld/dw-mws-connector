@@ -128,7 +128,7 @@ for report in report_types:
 
                 # Create a new file that excludes primary keys found in the new files
                 with open(original_file) as f_in, open(report['filename'], 'w') as f_out:
-                    for i, line in f_in:
+                    for i, line in enumerate(f_in):
                         if i not in indexes_to_remove:
                             f_out.write(line)
 
