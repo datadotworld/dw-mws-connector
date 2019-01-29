@@ -132,10 +132,12 @@ for report in report_types:
                         if i not in indexes_to_remove:
                             f_out.write(line)
 
-                with open(report['filename'], 'ab') as f_out:
+                with open(report['filename'], 'a') as f_out:
                     for filename in filenames:
-                        with open(filename, 'rb') as f_in:
-                            f_out.write(f_in.read())
+                        with open(filename, 'r') as f_in:
+                            next(f_in)
+                            for line in f_in:
+                                f_out.write(line)
             else:
                 print(f"No new data for {report['title']}")
 
