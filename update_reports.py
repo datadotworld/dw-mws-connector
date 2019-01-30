@@ -83,9 +83,12 @@ for report in report_types:
     def pull_reports_and_append(start_date):
         filenames = mws.pull_reports(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
         if filenames:
-            for filename in filenames:
-                with open(filename, 'rb') as f_in, open(report['filename'], 'ab') as f_out:
-                    f_out.write(f_in.read())
+            for i, filename in enumerate(filenames):
+                with open(filename, 'r') as f_in, open(report['filename'], 'a') as f_out:
+                    for line in f_in:
+                        if i > 0:
+                            next(f_in)
+                        f_out.write(line)
 
     if report['filename']:
         print(f"Working on {report['title']}")
