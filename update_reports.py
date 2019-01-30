@@ -124,7 +124,7 @@ for report in report_types:
                         if key_from_new_file in original_list_of_keys:
                             for i, key_from_original_list in enumerate(original_list_of_keys):
                                 if key_from_new_file == key_from_original_list:
-                                    indexes_to_remove.append(i + 2)  # accounting for 0-based indexing & header
+                                    indexes_to_remove.append(i + 1)  # accounting for the header
 
                 # Create a new file that excludes primary keys found in the new files
                 with open(original_file) as f_in, open(report['filename'], 'w') as f_out:
