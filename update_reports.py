@@ -120,16 +120,16 @@ for report in report_types:
                 # Determine which lines need to be removed from the original list
                 for filename in filenames:
                     df = pd.read_csv(filename, usecols=[report['primary_key']])
-                    for key_from_new_file in df[report['primary_key']]:
+                    for key_from_new_file in df[report['primary_key']].drop_duplicates():
                         if key_from_new_file in original_list_of_keys:
                             for i, key_from_original_list in enumerate(original_list_of_keys):
                                 if key_from_new_file == key_from_original_list:
-                                    indexes_to_remove.append(i)
+                                    indexes_to_remove.append(i + 2)  # accounting for 0-based indexing & header
 
                 # Create a new file that excludes primary keys found in the new files
                 with open(original_file) as f_in, open(report['filename'], 'w') as f_out:
                     for i, line in enumerate(f_in):
-                        if i not in indexes_to_remove:
+                        if i not in sorted(indexes_to_remove):
                             f_out.write(line)
 
                 with open(report['filename'], 'a') as f_out:
