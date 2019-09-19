@@ -214,9 +214,9 @@ for report in get_report_types:
 
             else:
                 print(f"No new data for {report['title']}")
-    if os.path.exists(report['filename']) and os.path.getsize(report['filename']) > 0:
-        print(f"Pushing {report['filename']} to data.world")
-    dw.push(report['filename'])
+        if os.path.exists(report['filename']) and os.path.getsize(report['filename']) > 0:
+            print(f"Pushing {report['filename']} to data.world")
+            dw.push(report['filename'])
 
 if not mws.error_occurred:
     print('Updating summary')
