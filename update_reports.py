@@ -86,6 +86,7 @@ match = re.match(pattern, summary, flags=re.DOTALL)
 date_match = re.search(r'(\d{4}-\d{2}-\d{2})', summary)
 
 current_time = now.isoformat()
+last_bot_run_date = None
 if match:
     print(f"Found a 'last bot run' entry in the dataset ({dataset_slug}): {match[2]}")
     last_bot_run_date = datetime.strptime(date_match.group(), '%Y-%m-%d')
@@ -179,7 +180,7 @@ for report in get_report_types:
     if report['filename']:
         start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
         # if this has been run before, we only want to get data since the last time it was run
-        if (last_bot_run_date > start_date):
+        if last_bot_run_date and last_bot_run_date > start_date:
             start_date = last_bot_run_date
         print(f"Working on {report['title']}")
         filesize = dw.fetch_file(report['filename'])
