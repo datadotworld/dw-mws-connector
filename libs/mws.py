@@ -37,6 +37,51 @@ class MWS:
         self.thirty_days = 2592000.0  # Seconds
         self.error_occurred = False
 
+    def _get_report_list(self, max_count, types, start_date, end_date, next_token=None):
+        filenames = list()
+        r = self.reports_api.get_report_list(max_count=max_count,types=types,fromdate=start_date.isoformat(), todate=end_date.isoformat(), next_token=next_token)
+
+        try:
+            has_next = r.parsed['HasNext']
+            if has_next == 'true':
+                next_token = r.parsed['NextToken']
+            if 'ReportInfo' in r.parsed:
+                reports = r.parsed['ReportInfo']
+                if isinstance(reports, list):
+                    for report in reports:
+                        report_id = report['ReportId']['value']
+                        available_date = report['AvailableDate']['value']
+                        raw_report = self._get_report(report_id) if report_id else None
+                        if raw_report:
+                            f = StringIO(raw_report)
+                            filename = f'{available_date}.settlement.mws.tmp.csv'
+                            pd.read_csv(f, sep='\t').to_csv(filename, index=False)
+                            filenames.append(filename)
+                            #sleep to avoid throttling
+                            time.sleep(60)
+                else:
+                    report_id = reports['ReportId']['value']
+                    available_date = reports['AvailableDate']['value']
+                    raw_report = self._get_report(report_id) if report_id else None
+                    if raw_report:
+                        f = StringIO(raw_report)
+                        filename = f'{available_date}.settlement.mws.tmp.csv'
+                        pd.read_csv(f, sep='\t').to_csv(filename, index=False)
+                        filenames.append(filename)
+
+        except Exception:
+            print(f'GetReportList failed for {types}')
+            raise        
+
+        if has_next == 'true':
+            filenames.extend(self._get_report_list(types=types, next_token=next_token))
+        return filenames
+
+    def get_reports(self, report_type, is_date_range_limited, start_date, end_date):
+        #first, get the report list
+        filenames = self._get_report_list(max_count='100', types=report_type, start_date=start_date, end_date=end_date)
+        return filenames
+
     def _request_report(self, report_type, start_date, end_date):
         r = self.reports_api.request_report(report_type=report_type,
                                             start_date=start_date.isoformat(),

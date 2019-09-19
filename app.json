@@ -26,6 +26,10 @@
       "description": "Name of the file for the FBA Fulfilled Shipments Report, e.g. AmazonFBAFulfilledShipments.csv",
       "required": false
     },
+    "SETTLEMENT_REPORTS_FILENAME": {
+      "description": "Name of the file for the Settlement Report, e.g. SETTLEMENT_REPORT_DATA_FLAT_FILE_V2.csv",
+      "required": false
+    },
     "START_DATE": {
       "description": "How far back to pull data. Format: 2017-01-01"
     },
