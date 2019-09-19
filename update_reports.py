@@ -38,7 +38,7 @@ marketplace_ids = tuple(os.environ['MWS_MARKETPLACE_IDS'].replace(' ', '').split
 
 last_thirty_days = os.environ.get('LAST_THIRTY_DAYS', None)
 
-report_types = [
+request_report_types = [
     {
         'title': 'All Orders Report',
         'filename': os.environ.get('ALL_ORDERS_FILENAME', None),
@@ -60,7 +60,18 @@ report_types = [
         'update_endpoint': '_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_',
         'primary_key': 'amazon-order-id',
         'is_date_range_limited': True,
-    }]
+    }, ]
+
+#Settlements Reports cannot be requested; only gotten-- i.e., they are prepared ahead of time, not generated on request
+get_report_types = [
+    {
+        'title': 'Amazon Pay Settlements Report',
+        'filename': os.environ.get('SETTLEMENTS_FILENAME', None),
+        'initial_endpoint': '_GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE_V2_',
+        'update_endpoint': '_GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE_V2_',
+        'is_date_range_limited': True, #Endpoint can only pull last 3 months of data
+    }
+]
 
 dw = Datadotworld(dw_token, dataset_slug)
 mws = MWS(access_key, secret_key, seller_id, auth_token, marketplace_ids)
@@ -71,15 +82,19 @@ now = datetime.utcnow().replace(microsecond=0)
 
 pattern = r'(.*LAST BOT RUN:) (.*) UTC(.*)'
 match = re.match(pattern, summary, flags=re.DOTALL)
+# Pull date from last bot run
+date_match = re.search(r'(\d{4}-\d{2}-\d{2})', summary)
+
 current_time = now.isoformat()
 if match:
     print(f"Found a 'last bot run' entry in the dataset ({dataset_slug}): {match[2]}")
+    last_bot_run_date = datetime.strptime(date_match.group(), '%Y-%m-%d')
     summary = re.sub(pattern, fr"\1 {current_time} UTC\3", summary, flags=re.DOTALL)
 else:
     print(f"No 'last bot run' entry found in the dataset ({dataset_slug})")
     summary = f"{summary}\n\nLAST BOT RUN: {current_time} UTC\n\n"
 
-for report in report_types:
+for report in request_report_types:
     def pull_reports_and_append(start_date):
         filenames = mws.pull_reports(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
         if filenames:
@@ -147,6 +162,60 @@ for report in report_types:
         if os.path.exists(report['filename']) and os.path.getsize(report['filename']) > filesize:
             print(f"Pushing {report['filename']} to data.world")
             dw.push(report['filename'])
+
+
+for report in get_report_types:
+    def pull_reports_and_append(start_date):
+        filenames = mws.get_reports(report['initial_endpoint'], report['is_date_range_limited'], start_date, now)
+        #concat everything together
+        if filenames:
+            for i, filename in enumerate(filenames):
+                with open(filename, 'r') as f_in, open(report['filename'], 'a') as f_out:
+                    if i > 0:
+                        next(f_in)
+                    for line in f_in:
+                        f_out.write(line)
+
+    if report['filename']:
+        start_date = datetime.strptime(os.environ['START_DATE'], '%Y-%m-%d')
+        # if this has been run before, we only want to get data since the last time it was run
+        if (last_bot_run_date > start_date):
+            start_date = last_bot_run_date
+        print(f"Working on {report['title']}")
+        filesize = dw.fetch_file(report['filename'])
+
+        if filesize > 0:
+            print(f"{report['filename']} found in the dataset, size: {filesize} bytes")
+        else:
+            print(f"{report['filename']} not found in the dataset")
+
+        if not match or filesize == 0:
+            print(f'Fetching data from Amazon from {start_date.isoformat()} to {current_time}')
+            pull_reports_and_append(start_date)
+        else:
+            print(f'Fetching data from Amazon from {start_date.isoformat()} to {current_time}')
+            filenames = mws.get_reports(report['update_endpoint'], report['is_date_range_limited'], start_date, now)
+            if filenames:
+                original_file = '.original'
+                shutil.copyfile(report['filename'], original_file)
+
+                # Create a new file
+                with open(original_file) as f_in, open(report['filename'], 'w') as f_out:
+                    for i, line in enumerate(f_in):
+                        f_out.write(line)
+
+                with open(report['filename'], 'a') as f_out:
+                    for filename in filenames:
+                        with open(filename, 'r') as f_in:
+                            next(f_in)
+                            for line in f_in:
+                                f_out.write(line)
+
+            else:
+                print(f"No new data for {report['title']}")
+    if os.path.exists(report['filename']) and os.path.getsize(report['filename']) > 0:
+        print(f"Pushing {report['filename']} to data.world")
+    dw.push(report['filename'])
 
 if not mws.error_occurred:
     print('Updating summary')
